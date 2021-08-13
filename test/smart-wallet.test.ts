@@ -2,7 +2,6 @@ import { RelayingServices, SmartWallet } from '../src';
 import { MockRelayingServices, Web3Mock } from './mock';
 import Expect = jest.Expect;
 import {
-    MOCK_ACCOUNT,
     MOCK_ADDRESS,
     MOCK_SMART_WALLET_ADDRESS,
     MOCK_TOKEN_ADDRESS
@@ -27,10 +26,6 @@ describe('Tests for smart wallet', () => {
         expect(smartWallet.deployed).toBeTruthy();
         expect(smartWallet.tokenAddress).toBeFalsy();
         expect(smartWallet.deployTransaction).toBeFalsy();
-    });
-
-    it('Should run allow token', async () => {
-        await sdk.allowToken(MOCK_TOKEN_ADDRESS, MOCK_ACCOUNT);
     });
 
     it('Should fail with smart wallet already deployed', async () => {
