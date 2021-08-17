@@ -57,6 +57,24 @@ export class Web3MethodsMock {
             }
         };
     }
+    public acceptsToken(address: string){
+        console.debug('acceptsToken', {
+            address
+        });
+        return {
+            call: () => {
+                return true;
+            }
+        };
+    }
+    public getAcceptedTokens(){
+        console.debug('getAcceptedTokens');
+        return {
+            call: () => {
+                return [MOCK_ADDRESS];
+            }
+        };
+    }
 }
 
 export class Web3ContractMock {
@@ -161,3 +179,4 @@ export class MockRelayingServices extends DefaultRelayingServices {
         return MOCK_ADDRESS;
     }
 }
+
