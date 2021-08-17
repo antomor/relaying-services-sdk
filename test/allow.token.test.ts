@@ -18,4 +18,11 @@ describe('Tests for allow token', () => {
     it('Should run allow token', async () => {
         await sdk.allowToken(MOCK_TOKEN_ADDRESS, MOCK_ACCOUNT);
     });
+    it('Should run is allow token', async () => {
+        await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
+    });
+    it('Should run get allow token', async () => {
+        let allowTokens = await sdk.getAllowedTokens();
+        console.log(allowTokens);
+    });
 });
