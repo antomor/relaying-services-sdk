@@ -1,5 +1,5 @@
 import { RelayingServices, SmartWallet } from '../src';
-import { MockRelayingServices } from './mock';
+import { MockRelayingServices, Web3Mock } from './mock';
 import { TransactionConfig, TransactionReceipt } from 'web3-core';
 import Expect = jest.Expect;
 import {
@@ -37,6 +37,14 @@ describe('Tests for relay transaction', () => {
 
 describe('Tests for smart wallet without being deployed', () => {
     let sdk: RelayingServices;
+
+    beforeEach(async () => {
+        sdk = new MockRelayingServices(
+            new Web3Mock({
+                getCodeEmpty: true
+            }) as any
+        );
+    });
 
     it('Should fail to relay transaction', async () => {
         const transaction: TransactionConfig = {
