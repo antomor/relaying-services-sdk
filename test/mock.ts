@@ -4,7 +4,7 @@ import {
     EnvelopingConfig,
     EnvelopingTransactionDetails
 } from '@rsksmart/rif-relay-common';
-import { RelayingServicesAddresses } from '../src/interfaces';
+import { RelayingServicesAddresses, SmartWallet } from '../src/interfaces';
 import { Contracts } from '../src/contracts';
 import { AbiItem } from 'web3-utils';
 import {
@@ -72,6 +72,18 @@ export class Web3MethodsMock {
         return {
             call: () => {
                 return [MOCK_ADDRESS];
+            }
+        };
+    }
+    async generateSmartWallet(smartWalletIndex: number) {
+        console.debug('generateSmartWallet');
+        return {
+            call: () => {
+                return {
+                    address: MOCK_SMART_WALLET_ADDRESS,
+                    index: smartWalletIndex,
+                    deployed: true
+                };
             }
         };
     }
