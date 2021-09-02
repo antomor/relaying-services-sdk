@@ -10,25 +10,25 @@ import {
 } from './constants';
 
 declare const expect: Expect;
-
+const transaction: TransactionConfig = {
+    from: MOCK_ADDRESS,
+    to: MOCK_CONTRACT_ADDRESS,
+    value: 1
+};
+const smartWallet: SmartWallet = {
+    address: MOCK_SMART_WALLET_ADDRESS,
+    index: 0,
+    deployed: true
+};
 describe('Tests for relay transaction', () => {
     let sdk: RelayingServices;
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
+        sdk.initialize({});
     });
 
     it('Should relay transaction successfully', async () => {
-        const transaction: TransactionConfig = {
-            from: MOCK_ADDRESS,
-            to: MOCK_CONTRACT_ADDRESS,
-            value: 1
-        };
-        const smartWallet: SmartWallet = {
-            address: MOCK_SMART_WALLET_ADDRESS,
-            index: 0,
-            deployed: true
-        };
         const transactionReceipt: TransactionReceipt =
             await sdk.relayTransaction(transaction, smartWallet, 0);
         expect(transactionReceipt).toBe(MOCK_TRANSACTION_RECEIPT);
@@ -47,19 +47,9 @@ describe('Tests for smart wallet without being deployed', () => {
     });
 
     it('Should fail to relay transaction', async () => {
-        const transaction: TransactionConfig = {
-            from: MOCK_ADDRESS,
-            to: MOCK_CONTRACT_ADDRESS,
-            value: 1
-        };
-        const smartWallet: SmartWallet = {
-            address: MOCK_SMART_WALLET_ADDRESS,
-            index: 0,
-            deployed: true
-        };
         try {
             await sdk.relayTransaction(transaction, smartWallet, 0);
-        } catch (error) {
+        } catch (error:any) {
             expect(error.message).toBe(
                 `Smart Wallet is not deployed or the address ${smartWallet.address} is not a smart wallet.`
             );

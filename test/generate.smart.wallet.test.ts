@@ -1,9 +1,9 @@
-import { RelayingServices } from '../src';
 import { MockRelayingServices, Web3Mock } from './mock';
 import Expect = jest.Expect;
 import {
     MOCK_SMART_WALLET_ADDRESS,
 } from './constants';
+import { RelayingServices } from '../src';
 
 declare const expect: Expect;
 
@@ -12,6 +12,7 @@ describe('Tests for is generate smart wallet', () => {
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
+        sdk.initialize({});
     });
 
     it('Should return is deployed smart wallet', async () => {

@@ -13,6 +13,7 @@ describe('Tests for smart wallet', () => {
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
+        sdk.initialize({});
     });
 
     it('Should fail with smart wallet already deployed', async () => {
@@ -20,12 +21,14 @@ describe('Tests for smart wallet', () => {
             await sdk.deploySmartWallet(
                 {
                     address: MOCK_SMART_WALLET_ADDRESS,
-                    index: 0
+                    index: 0,
+                    deployed: true
                 },
                 MOCK_TOKEN_ADDRESS,
                 0
             );
-        } catch (error) {
+            fail('The small wallet this not already deployed');
+        } catch (error:any) {
             expect(error.message).toBe('Smart Wallet already deployed');
         }
     });

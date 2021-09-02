@@ -12,9 +12,14 @@ describe('Tests for is allow token', () => {
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
+        sdk.initialize({});
     });
 
     it('Should run is allow token', async () => {
-        await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
+        try{
+            await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
+        }catch(error){
+            fail('The token is not allow')
+        }
     });
 });

@@ -34,13 +34,13 @@ export class DefaultRelayingServices implements RelayingServices {
     protected developmentAccounts: string[];
     protected relayProvider: RelayProvider;
     protected contracts: Contracts;
+    protected contractAddresses: RelayingServicesAddresses;
+    protected envelopingConfig: EnvelopingConfig;
 
     constructor({
         rskHost,
         account,
-        envelopingConfig,
         web3Provider,
-        contractAddresses,
         web3Instance
     }: RelayingServicesConfiguration) {
         this.web3Instance = web3Instance
@@ -49,13 +49,6 @@ export class DefaultRelayingServices implements RelayingServices {
             ? new Web3(web3Provider as any)
             : new Web3(rskHost);
         this.account = account;
-        this.initialize(envelopingConfig, contractAddresses)
-            .then(() => {
-                console.debug('RelayingServicesSDK initialized correctly');
-            })
-            .catch((error) => {
-                console.error('RelayingServicesSDK fail to initialize', error);
-            });
     }
 
     async configure(
@@ -91,27 +84,32 @@ export class DefaultRelayingServices implements RelayingServices {
         envelopingConfig: Partial<EnvelopingConfig>,
         contractAddresses?: RelayingServicesAddresses
     ): Promise<void> {
-        this.developmentAccounts = await this.web3Instance.eth.getAccounts();
-        const provider = new RelayProvider(
-            this.web3Instance.currentProvider as HttpProvider,
-            await this.configure(envelopingConfig)
-        );
-        if (this.account) {
-            provider.addAccount({
-                address: this.account.address,
-                privateKey: Buffer.from(
-                    this.account.privateKey.replaceAll('0x', ''),
-                    'hex'
-                )
-            });
+        try{
+            this.developmentAccounts = await this.web3Instance.eth.getAccounts();
+            const provider = new RelayProvider(
+                this.web3Instance.currentProvider as HttpProvider,
+                await this.configure(envelopingConfig)
+            );
+            if (this.account) {
+                provider.addAccount({
+                    address: this.account.address,
+                    privateKey: Buffer.from(
+                        this.account.privateKey.replaceAll('0x', ''),
+                        'hex'
+                    )
+                });
+            }
+            this.web3Instance.setProvider(provider);
+            this.relayProvider = provider;
+            this.contracts = new Contracts(
+                this.web3Instance,
+                await this.web3Instance.eth.getChainId(),
+                contractAddresses
+            );
+            console.debug('RelayingServicesSDK initialized correctly');
+        }catch(error){
+            console.error('RelayingServicesSDK fail to initialize', error);
         }
-        this.web3Instance.setProvider(provider);
-        this.relayProvider = provider;
-        this.contracts = new Contracts(
-            this.web3Instance,
-            await this.web3Instance.eth.getChainId(),
-            contractAddresses
-        );
     }
 
     async allowToken(

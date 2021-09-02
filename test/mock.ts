@@ -147,7 +147,7 @@ export class MockContracts extends Contracts {
         super(web3Instance ? web3Instance : web3Mock, 33);
     }
 
-    async initialize(): Promise<void> {
+    initialize(): void {
         console.debug('Initializing MockContracts');
         return super.initialize();
     }
@@ -162,6 +162,14 @@ export class MockRelayProvider {
         });
         return Promise.resolve(MOCK_TRANSACTION_HASH);
     }
+    async getAllowedTokens() {
+        console.debug('getAllowedTokens');
+        return {
+            call: () => {
+                return [MOCK_SMART_WALLET_ADDRESS]
+            }
+        };
+    }
 }
 
 export class MockRelayingServices extends DefaultRelayingServices {
@@ -173,7 +181,7 @@ export class MockRelayingServices extends DefaultRelayingServices {
         });
     }
 
-    async initialize(
+    public async initialize(
         envelopingConfig: Partial<EnvelopingConfig>,
         contractAddresses?: RelayingServicesAddresses
     ): Promise<void> {

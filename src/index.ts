@@ -3,9 +3,18 @@
  */
 import { Account, TransactionConfig, TransactionReceipt } from 'web3-core';
 import { DefaultRelayingServices } from './sdk';
-import { RelayingServicesConfiguration, SmartWallet } from './interfaces';
+import { RelayingServicesAddresses, RelayingServicesConfiguration, SmartWallet } from './interfaces';
+import { EnvelopingConfig } from '@rsksmart/rif-relay-common';
 
 interface RelayingServices {
+    /**
+     * This operation initialize the realying service sdk.
+     *
+     * @param envelopingConfig the partial enveloping configuration
+     * @param contractAddresses the contract addresses optional
+     */
+     initialize(envelopingConfig: Partial<EnvelopingConfig>, contractAddresses?:RelayingServicesAddresses): Promise<void>;
+
     /**
      * This operation generates an smart wallet for the specified index.
      *

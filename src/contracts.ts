@@ -18,33 +18,32 @@ export class Contracts {
 
     constructor(
         web3Instance: Web3,
-        chainId: number,
+        chainId?: number,
         contractAddresses?: RelayingServicesAddresses
     ) {
         this.web3Instance = web3Instance;
         this.addresses =
             contractAddresses ??
             getContractAddresses(chainId ?? DEFAULT_NETWORK_ID);
-        this.initialize()
-            .then(() => {
-                console.debug('Contracts initialized correctly');
-            })
-            .catch((error) => {
-                console.error('Contracts fail to initialize', error);
-            });
+        this.initialize();
     }
 
-    async initialize(): Promise<void> {
-        this.smartWalletRelayVerifier = getContract(
-            this.web3Instance,
-            RelayVerifier.abi,
-            this.addresses.smartWalletRelayVerifier
-        );
-        this.smartWalletDeployVerifier = getContract(
-            this.web3Instance,
-            DeployVerifier.abi,
-            this.addresses.smartWalletDeployVerifier
-        );
+    protected initialize(): void {
+        try{
+            this.smartWalletRelayVerifier = getContract(
+                this.web3Instance,
+                RelayVerifier.abi,
+                this.addresses.smartWalletRelayVerifier
+            );
+            this.smartWalletDeployVerifier = getContract(
+                this.web3Instance,
+                DeployVerifier.abi,
+                this.addresses.smartWalletDeployVerifier
+            );
+            console.debug('Contracts initialized correctly');
+        }catch(error){
+            console.error('Contracts fail to initialize', error);
+        }
     }
 
     public getSmartWalletFactory(): Contract {
