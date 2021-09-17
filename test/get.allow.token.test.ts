@@ -13,7 +13,7 @@ describe('Tests for get allow token', () => {
         sdk.initialize({});
     });
 
-    it('Should run get allow token', async () => {
+    it('Should get the allowed tokens', async () => {
         try{
             const allowTokens = await sdk.getAllowedTokens();
             expect(allowTokens.length).toBeGreaterThan(0);
