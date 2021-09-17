@@ -15,7 +15,7 @@ describe('Tests for is allow token', () => {
         sdk.initialize({});
     });
 
-    it('Should run is allow token', async () => {
+    it('Should check for allowed tokens', async () => {
         try{
             await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
         }catch(error){
