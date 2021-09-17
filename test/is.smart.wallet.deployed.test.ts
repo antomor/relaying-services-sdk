@@ -15,7 +15,7 @@ describe('Tests for is smart wallet', () => {
         sdk.initialize({});
     });
 
-    it('Should return is deployed smart wallet', async () => {
+    it('Should check if a smart wallet is deployed', async () => {
         const deployed = await sdk.isSmartWalletDeployed(
             MOCK_SMART_WALLET_ADDRESS
         );
