@@ -1,8 +1,6 @@
-import { MockRelayingServices, Web3Mock } from './mock';
+import { MockRelayingServices } from './mock';
 import Expect = jest.Expect;
-import {
-    MOCK_SMART_WALLET_ADDRESS,
-} from './constants';
+import { MOCK_SMART_WALLET_ADDRESS } from './constants';
 import { RelayingServices } from '../src';
 
 declare const expect: Expect;
@@ -12,11 +10,11 @@ describe('Tests for is generate smart wallet', () => {
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
-        sdk.initialize({});
+        await sdk.initialize({});
     });
 
-    it('Should generated a deployed smart wallet', async () => {
-        const smallWalletIndex:number = 0;
+    it('Should return is deployed smart wallet', async () => {
+        const smallWalletIndex = 0;
         const smartWallet = await sdk.generateSmartWallet(smallWalletIndex);
         expect(smartWallet.deployed).toBeTruthy();
         expect(smartWallet.address).toEqual(MOCK_SMART_WALLET_ADDRESS);

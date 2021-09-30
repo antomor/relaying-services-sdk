@@ -1,10 +1,7 @@
 import { RelayingServices } from '../src';
 import { MockRelayingServices } from './mock';
+import { MOCK_TOKEN_ADDRESS } from './constants';
 import Expect = jest.Expect;
-import {
-    MOCK_TOKEN_ADDRESS
-} from './constants';
-
 declare const expect: Expect;
 
 describe('Tests for is allow token', () => {
@@ -12,14 +9,15 @@ describe('Tests for is allow token', () => {
 
     beforeEach(async () => {
         sdk = new MockRelayingServices();
-        sdk.initialize({});
+        await sdk.initialize({});
     });
 
-    it('Should check for allowed tokens', async () => {
-        try{
-            await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
-        }catch(error){
-            fail('The token is not allow')
+    it('Should run is allow token', async () => {
+        try {
+            const allowTokens = await sdk.isAllowedToken(MOCK_TOKEN_ADDRESS);
+            expect(allowTokens).toBeTruthy();
+        } catch (error) {
+            fail('The token is not allow');
         }
     });
 });

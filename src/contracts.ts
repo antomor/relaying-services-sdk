@@ -1,8 +1,7 @@
 import Web3 from 'web3';
 import { Contract } from 'web3-eth-contract';
 import { RelayingServicesAddresses } from './interfaces';
-import { getContract, getContractAddresses } from './utils';
-import { DEFAULT_NETWORK_ID } from './constants';
+import { getContract, getContractAddresses, mergeConfiguration } from './utils';
 import {
     DeployVerifier,
     RelayVerifier,
@@ -22,14 +21,17 @@ export class Contracts {
         contractAddresses?: RelayingServicesAddresses
     ) {
         this.web3Instance = web3Instance;
-        this.addresses =
-            contractAddresses ??
-            getContractAddresses(chainId ?? DEFAULT_NETWORK_ID);
+        contractAddresses = contractAddresses ?? <RelayingServicesAddresses>{};
+        const contracts: RelayingServicesAddresses =
+            getContractAddresses(chainId);
+        this.addresses = <RelayingServicesAddresses>(
+            mergeConfiguration(contractAddresses, contracts)
+        );
         this.initialize();
     }
 
     protected initialize(): void {
-        try{
+        try {
             this.smartWalletRelayVerifier = getContract(
                 this.web3Instance,
                 RelayVerifier.abi,
@@ -41,8 +43,8 @@ export class Contracts {
                 this.addresses.smartWalletDeployVerifier
             );
             console.debug('Contracts initialized correctly');
-        }catch(error){
-            console.error('Contracts fail to initialize', error);
+        } catch (error: any) {
+            throw new Error('Contracts fail to initialize: ' + error.message);
         }
     }
 

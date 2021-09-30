@@ -4,7 +4,7 @@ import Expect = jest.Expect;
 import {
     MOCK_SMART_WALLET_ADDRESS,
     MOCK_TOKEN_ADDRESS,
-    MOCK_TRANSACTION_RECEIPT
+    MOCK_TRANSACTION_HASH
 } from './constants';
 
 declare const expect: Expect;
@@ -18,7 +18,7 @@ describe('Tests for smart wallet', () => {
                 getCodeEmpty: false
             }) as any
         );
-        sdk.initialize({});
+        await sdk.initialize({});
     });
 
     it('Should fail with smart wallet already deployed', async () => {
@@ -33,7 +33,7 @@ describe('Tests for smart wallet', () => {
                 0
             );
             fail('The smart wallet this not already deployed');
-        } catch (error:any) {
+        } catch (error: any) {
             expect(error.message).toBe('Smart Wallet already deployed');
         }
     });
@@ -48,7 +48,7 @@ describe('Tests for smart wallet without being deployed', () => {
                 getCodeEmpty: true
             }) as any
         );
-        sdk.initialize({});
+        await sdk.initialize({});
     });
 
     it('Should deploy smart wallet successfully', async () => {
@@ -65,6 +65,6 @@ describe('Tests for smart wallet without being deployed', () => {
         expect(smartWallet.index).toBe(0);
         expect(smartWallet.deployed).toBeTruthy();
         expect(smartWallet.tokenAddress).toBe(MOCK_TOKEN_ADDRESS);
-        expect(smartWallet.deployTransaction).toBe(MOCK_TRANSACTION_RECEIPT);
+        expect(smartWallet.deployTransaction).toBe(MOCK_TRANSACTION_HASH);
     });
 });
