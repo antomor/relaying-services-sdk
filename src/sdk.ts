@@ -132,7 +132,7 @@ export class DefaultRelayingServices implements RelayingServices {
             account
         });
         if (!account) {
-            account = this.getAccountAddress();
+            account = this._getAccountAddress();
         }
 
         const smartWalletDeployVerifier =
@@ -267,7 +267,7 @@ export class DefaultRelayingServices implements RelayingServices {
                 smartWallet.address
             );
             const txDetails = <EnvelopingTransactionDetails>{
-                from: this.getAccountAddress(),
+                from: this._getAccountAddress(),
                 to: ZERO_ADDRESS,
                 callVerifier:
                     this.contracts.addresses.smartWalletDeployVerifier,
@@ -311,7 +311,7 @@ export class DefaultRelayingServices implements RelayingServices {
 
         const smartWalletAddress = await smartWalletFactory.methods
             .getSmartWalletAddress(
-                this.getAccountAddress(),
+                this._getAccountAddress(),
                 ZERO_ADDRESS,
                 smartWalletIndex
             )
@@ -356,7 +356,7 @@ export class DefaultRelayingServices implements RelayingServices {
                 method: 'eth_sendTransaction',
                 params: [
                     {
-                        from: this.getAccountAddress(),
+                        from: this._getAccountAddress(),
                         to: smartWallet.tokenAddress,
                         value: '0',
                         relayHub: this.contracts.addresses.relayHub,
@@ -415,7 +415,7 @@ export class DefaultRelayingServices implements RelayingServices {
         const tokenAmount = await this.web3Instance.utils.toWei('1');
 
         const trxDetails: EnvelopingTransactionDetails = {
-            from: this.getAccountAddress(),
+            from: this._getAccountAddress(),
             to: ZERO_ADDRESS.toString(),
             value: '0',
             relayHub: this.contracts.addresses.relayHub,
@@ -440,7 +440,110 @@ export class DefaultRelayingServices implements RelayingServices {
         return estimate.toString();
     }
 
-    getAccountAddress(): string {
+    async estimateMaxPossibleRelayGasWithLinearFit(
+        destinationContract: string,
+        smartWalletAddress: string,
+        tokenFees: string,
+        abiEncodedTx: string,
+        relayWorker: string
+    ): Promise<number> {
+        console.debug('estimateMaxPossibleRelayGasWithLinearFit Params', {
+            destinationContract,
+            smartWalletAddress,
+            tokenFees,
+            abiEncodedTx,
+            relayWorker
+        });
+
+        const gasPrice = toBN(
+            await this.relayProvider.relayClient._calculateGasPrice()
+        );
+        const tokenAmount = await this.web3Instance.utils.toWei(tokenFees);
+        const trxDetails = {
+            from: this._getAccountAddress(),
+            to: destinationContract,
+            value: '0',
+            relayHub: this.contracts.addresses.relayHub,
+            callVerifier: this.contracts.addresses.smartWalletRelayVerifier,
+            callForwarder: smartWalletAddress,
+            data: abiEncodedTx,
+            tokenContract: this.contracts.addresses.testToken,
+            tokenAmount: tokenAmount,
+            onlyPreferredRelays: true
+        };
+
+        const maxPossibleGasValue =
+            await this.relayProvider.relayClient.estimateMaxPossibleRelayGasWithLinearFit(
+                trxDetails,
+                relayWorker
+            );
+        const maxPossibleGas = toBN(maxPossibleGasValue);
+        const estimate = maxPossibleGas.mul(gasPrice);
+        return Number(estimate.toString());
+    }
+
+    async send(
+        destinationContract: string,
+        smartWalletAddress: string,
+        tokenFees: string,
+        abiEncodedTx: string
+    ): Promise<TransactionReceipt> {
+        try {
+            console.debug('send Params', {
+                destinationContract,
+                smartWalletAddress,
+                tokenFees,
+                abiEncodedTx
+            });
+            const jsonRpcPayload = {
+                jsonrpc: '2.0',
+                id: ++this.txId,
+                method: 'eth_sendTransaction',
+                params: [
+                    {
+                        from: this._getAccountAddress(),
+                        to: destinationContract,
+                        value: '0',
+                        relayHub: this.contracts.addresses.relayHub,
+                        callVerifier:
+                            this.contracts.addresses.smartWalletRelayVerifier,
+                        callForwarder: smartWalletAddress,
+                        data: abiEncodedTx,
+                        tokenContract: this.contracts.addresses.testToken,
+                        tokenAmount: web3.utils.toWei(tokenFees),
+                        onlyPreferredRelays: true
+                    }
+                ]
+            };
+            const transactionReceipt: TransactionReceipt = await new Promise(
+                (resolve, reject) => {
+                    return this.relayProvider.send(
+                        jsonRpcPayload,
+                        async (error, jsonrpc) => {
+                            if (error) {
+                                reject(error);
+                            }
+                            const recipint =
+                                await web3.eth.getTransactionReceipt(
+                                    jsonrpc.result
+                                );
+                            resolve(recipint);
+                        }
+                    );
+                }
+            );
+            if (!transactionReceipt.status) {
+                const errorMessage = 'Error relaying transaction';
+                console.debug(errorMessage, transactionReceipt);
+                throw new Error(errorMessage);
+            }
+            return transactionReceipt;
+        } catch (error) {
+            console.error(error);
+        }
+    }
+
+    private _getAccountAddress(): string {
         return this.account
             ? this.account.address
             : this.developmentAccounts[0];
