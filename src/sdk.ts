@@ -523,7 +523,7 @@ export class DefaultRelayingServices implements RelayingServices {
                             if (error) {
                                 reject(error);
                             }
-                            const recipint =
+                            const recipient =
                                 await web3.eth.getTransactionReceipt(
                                     jsonrpc.result
                                 );
