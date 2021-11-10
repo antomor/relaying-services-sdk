@@ -527,7 +527,7 @@ export class DefaultRelayingServices implements RelayingServices {
                                 await web3.eth.getTransactionReceipt(
                                     jsonrpc.result
                                 );
-                            resolve(recipint);
+                            resolve(recipient);
                         }
                     );
                 }
