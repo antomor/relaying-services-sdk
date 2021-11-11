@@ -482,67 +482,6 @@ export class DefaultRelayingServices implements RelayingServices {
         return Number(estimate.toString());
     }
 
-    async send(
-        destinationContract: string,
-        smartWalletAddress: string,
-        tokenFees: string,
-        abiEncodedTx: string
-    ): Promise<TransactionReceipt> {
-        try {
-            console.debug('send Params', {
-                destinationContract,
-                smartWalletAddress,
-                tokenFees,
-                abiEncodedTx
-            });
-            const jsonRpcPayload = {
-                jsonrpc: '2.0',
-                id: ++this.txId,
-                method: 'eth_sendTransaction',
-                params: [
-                    {
-                        from: this._getAccountAddress(),
-                        to: destinationContract,
-                        value: '0',
-                        relayHub: this.contracts.addresses.relayHub,
-                        callVerifier:
-                            this.contracts.addresses.smartWalletRelayVerifier,
-                        callForwarder: smartWalletAddress,
-                        data: abiEncodedTx,
-                        tokenContract: this.contracts.addresses.testToken,
-                        tokenAmount: web3.utils.toWei(tokenFees),
-                        onlyPreferredRelays: true
-                    }
-                ]
-            };
-            const transactionReceipt: TransactionReceipt = await new Promise(
-                (resolve, reject) => {
-                    return this.relayProvider.send(
-                        jsonRpcPayload,
-                        async (error, jsonrpc) => {
-                            if (error) {
-                                reject(error);
-                            }
-                            const recipint =
-                                await web3.eth.getTransactionReceipt(
-                                    jsonrpc.result
-                                );
-                            resolve(recipint);
-                        }
-                    );
-                }
-            );
-            if (!transactionReceipt.status) {
-                const errorMessage = 'Error relaying transaction';
-                console.debug(errorMessage, transactionReceipt);
-                throw new Error(errorMessage);
-            }
-            return transactionReceipt;
-        } catch (error) {
-            console.error(error);
-        }
-    }
-
     private _getAccountAddress(): string {
         return this.account
             ? this.account.address

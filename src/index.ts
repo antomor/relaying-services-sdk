@@ -105,7 +105,7 @@ interface RelayingServices {
     /**
      * It executes a estimate max possible relay gas to get a number value
      *
-     * @param smartWallet the transaction details
+     * @param smartWallet address create the transaction details for forwarder transaction
      * @param relayWorker the realy worker contract address
      */
     estimateMaxPossibleRelayGas(
@@ -129,22 +129,6 @@ interface RelayingServices {
         abiEncodedTx: string,
         relayWorker: string
     ): Promise<number>;
-
-    /**
-     * It attempts to relay a send custom transaction using the provided SmartWallet and optional token. If token is not specified
-     * the relay will be subsidized.
-     *
-     * @param destinationContract destination contract address
-     * @param smartWalletAddress smart wallet address to all forwarder transaction
-     * @param tokenFees amount of token that cost the transaction
-     * @param abiEncodedTx Abi encoding transaction details
-     */
-    send(
-        destinationContract: string,
-        smartWalletAddress: string,
-        tokenFees: string,
-        abiEncodedTx: string
-    ): Promise<TransactionReceipt>;
 }
 
 export {
