@@ -446,7 +446,7 @@ export class DefaultRelayingServices implements RelayingServices {
         tokenFees: string,
         abiEncodedTx: string,
         relayWorker: string
-    ): Promise<number> {
+    ): Promise<string> {
         console.debug('estimateMaxPossibleRelayGasWithLinearFit Params', {
             destinationContract,
             smartWalletAddress,
@@ -479,7 +479,7 @@ export class DefaultRelayingServices implements RelayingServices {
             );
         const maxPossibleGas = toBN(maxPossibleGasValue);
         const estimate = maxPossibleGas.mul(gasPrice);
-        return Number(estimate.toString());
+        return estimate.toString();
     }
 
     private _getAccountAddress(): string {

@@ -128,7 +128,7 @@ interface RelayingServices {
         tokenFees: string,
         abiEncodedTx: string,
         relayWorker: string
-    ): Promise<number>;
+    ): Promise<string>;
 }
 
 export {
