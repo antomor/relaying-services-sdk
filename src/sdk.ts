@@ -236,7 +236,7 @@ export class DefaultRelayingServices implements RelayingServices {
             tokenAddress,
             tokenAmount
         });
-        tokenAmount = tokenAmount ?? 0;
+        // tokenAmount = tokenAmount ?? 0;
         console.debug('Checking if the wallet already exists');
         const smartWalletDeployed = await addressHasCode(
             this.web3Instance,
@@ -273,7 +273,7 @@ export class DefaultRelayingServices implements RelayingServices {
                     this.contracts.addresses.smartWalletDeployVerifier,
                 callForwarder: this.contracts.addresses.smartWalletFactory,
                 tokenContract: tokenAddress,
-                tokenAmount: tokenAmount.toString(),
+                tokenAmount: tokenAmount?.toString(),
                 data: '0x',
                 index: smartWallet.index.toString(),
                 recoverer: ZERO_ADDRESS,
@@ -365,7 +365,7 @@ export class DefaultRelayingServices implements RelayingServices {
                         callForwarder: smartWallet.address,
                         data: unsignedTx.data,
                         tokenContract: smartWallet.tokenAddress,
-                        tokenAmount: await this.web3Instance.utils.toWei(
+                        tokenAmount: [null, undefined].includes(tokenAmount) ? undefined : this.web3Instance.utils.toWei(
                             tokenAmount.toString()
                         ),
                         onlyPreferredRelays: true
