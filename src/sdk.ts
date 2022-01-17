@@ -343,40 +343,43 @@ export class DefaultRelayingServices implements RelayingServices {
         unsignedTx: TransactionConfig,
         smartWallet: SmartWallet,
         tokenAmount?: number,
+        tokenGas?: string,
         collectorContract?: Address
     ): Promise<TransactionReceipt> {
         console.debug('relayTransaction Params', {
             unsignedTx,
             smartWallet,
             tokenAmount,
+            tokenGas,
             collectorContract
         });
         console.debug('Checking if the wallet exists');
         if (await addressHasCode(this.web3Instance, smartWallet.address)) {
+            const param = {
+                from: this._getAccountAddress(),
+                to: smartWallet.tokenAddress,
+                value: '0',
+                relayHub: this.contracts.addresses.relayHub,
+                callVerifier: this.contracts.addresses.smartWalletRelayVerifier,
+                callForwarder: smartWallet.address,
+                data: unsignedTx.data,
+                tokenContract: smartWallet.tokenAddress,
+                tokenAmount: [null, undefined].includes(tokenAmount)
+                    ? undefined
+                    : this.web3Instance.utils.toWei(
+                        tokenAmount.toString()
+                    ),
+                collectorContract: collectorContract,
+                tokenGas: [null, undefined].includes(tokenGas)
+                ? undefined: tokenGas,
+                onlyPreferredRelays: true
+            };
             const jsonRpcPayload = {
                 jsonrpc: '2.0',
                 id: ++this.txId,
                 method: 'eth_sendTransaction',
                 params: [
-                    {
-                        from: this._getAccountAddress(),
-                        to: smartWallet.tokenAddress,
-                        value: '0',
-                        relayHub: this.contracts.addresses.relayHub,
-                        callVerifier:
-                            this.contracts.addresses.smartWalletRelayVerifier,
-                        callForwarder: smartWallet.address,
-                        data: unsignedTx.data,
-                        tokenContract: smartWallet.tokenAddress,
-                        tokenAmount: [null, undefined].includes(tokenAmount)
-                            ? undefined
-                            : this.web3Instance.utils.toWei(
-                                  tokenAmount.toString()
-                              ),
-                        collectorContract: collectorContract,
-                        tokenGas: '223000',
-                        onlyPreferredRelays: true
-                    }
+                    param
                 ]
             };
             const transactionReceipt: TransactionReceipt = await new Promise(
